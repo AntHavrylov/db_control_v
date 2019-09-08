@@ -1,0 +1,32 @@
+public void dumpMysqlProcedures() {
+
+            //Delete old dump file if exists
+            if (File.Exists(dumpPath))
+            {
+                // If file found, delete it    
+                File.Delete(dumpPath);
+                Console.WriteLine("Old dump file deleted.");
+            }
+
+            //command for dumping stored procedures
+            string mySqlDumpArguments = "-h"+source_url+" -u"+source_username+" -p"+source_userpassword+" -n -d -t --routines --triggers "+database_name+" > "+dumpPath;
+
+            //Start mysqldump process
+			Process mySqlProcess;
+			mySqlProcess = new Process();
+            mySqlProcess.StartInfo.Verb = "runas";
+            mySqlProcess.StartInfo.CreateNoWindow = true;
+            mySqlProcess.StartInfo.UseShellExecute = false;
+            mySqlProcess.StartInfo.RedirectStandardError = true;
+            mySqlProcess.StartInfo.RedirectStandardOutput = true;
+            mySqlProcess.StartInfo.FileName = mysqlDumpPath;
+            mySqlProcess.StartInfo.Arguments = mySqlDumpArguments;
+            mySqlProcess.Start();
+
+            //write output
+            Console.WriteLine("MysqlDump process started with arguments: " + mySqlDumpArguments);
+            string mysql_process_output = mySqlProcess.StandardOutput.ReadToEnd();
+            mySqlProcess.WaitForExit();
+            Console.WriteLine(mysql_process_output);
+
+        }

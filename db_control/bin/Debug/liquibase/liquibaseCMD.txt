@@ -1,0 +1,51 @@
+#generate from AWS
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-master.xml --url="jdbc:mysql://mydb.ctjag3v4vnsn.us-east-2.rds.amazonaws.com:3306/liquibase_test" --username=master --password=masterpass generateChangeLog
+
+#generate master from localhost
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-master.xml --url="jdbc:mysql://localhost:3306/liquibase_test" --username=root --password=123456 generateChangeLog
+
+#update AWS From db.changelog-1.xml
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-1.xml --url="jdbc:mysql://mydb.ctjag3v4vnsn.us-east-2.rds.amazonaws.com:3306/liquibase_test" --username=master --password=masterpass update
+
+#diffChangeLog - difference between databases (target)localhost - (source)AWS
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-1.xml --url="jdbc:mysql://localhost:3306/liquibase_test?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" --username=root --password=123456 --referenceUrl="jdbc:mysql://mydb.ctjag3v4vnsn.us-east-2.rds.amazonaws.com:3306/liquibase_test" --referenceUsername=master --referencePassword=masterpass diffChangeLog
+
+#diffChangeLog - difference between databases (target)AWS - (source)localhost
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-1.xml --url="jdbc:mysql://mydb.ctjag3v4vnsn.us-east-2.rds.amazonaws.com:3306/liquibase_test" --username=master --password=masterpass --referenceUrl="jdbc:mysql://localhost:3306/dot?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" --referenceUsername=root --referencePassword=123456 diffChangeLog
+
+#update AWS From db.changelog-1.xml
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-1.xml --url="jdbc:mysql://mydb.ctjag3v4vnsn.us-east-2.rds.amazonaws.com:3306/liquibase_test" --username=master --password=masterpass update
+
+
+
+
+
+
+
+#DUMP COLUMNS AND VIEWS WITH LIQUIBASE
+liquibase --driver=com.mysql.jdbc.Driver --classpath=mysql-connector-java-8.0.16.jar --changeLogFile=logs/db.changelog-1.xml --url="jdbc:mysql://192.168.1.2:3306/his?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" --username=sniper --password=sniper123! --referenceUrl="jdbc:mysql://localhost:3306/his?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" --referenceUsername=root --referencePassword=123456 diffChangeLog
+		  
+
+#DUMP STORED PROCEDURES ONLY
+mysqldump -hlocalhost -uroot -p123456 -n -d -t --routines --triggers ac > MySQLStoredProc.sql
+mysql -h192.168.1.2 -usniper -psniper123! ac < acViews.sql
+
+
+mysqldump -hlocalhost -uroot -p123456 -no-data --opt ac > acViews.sql
+
+
+
+mysql -uroot -p123456 AN -e"select concat('SHOW CREATE VIEW ',table_schema,'.',table_name,';') from information_schema.views" | sed 's/;/\\G/g' | mysql --uroot -p123456 > /root/MySQLDBViews.sql
+
+
+
+
+localhost:3306
+root
+123456
+
+192.168.1.2:3306
+sniper
+sniper123!
+
+
